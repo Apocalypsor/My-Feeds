@@ -3,6 +3,7 @@
 import requests
 from bs4 import BeautifulSoup
 
+import os
 import datetime
 
 def getContent(limit=7):
