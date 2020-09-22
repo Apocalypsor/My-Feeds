@@ -41,8 +41,9 @@ def getContent(limit=5):
                         'Referer': item['link']
                     }
                     
-                    print(f'Downloading: {pics['src']}')
-                    pic = requests.get(pics['src'], headers=headers)
+                    url = pics['src']}
+                    print(f'Downloading: {url}')
+                    pic = requests.get(url, headers=headers)
                     folder = 'dist/assets/dmzj/' + pics['src'].split('https://images.dmzj.com/resource/news/')[1]
                     os.makedirs(os.path.dirname(folder), exist_ok=True)
                     with open(folder, 'wb') as f:
