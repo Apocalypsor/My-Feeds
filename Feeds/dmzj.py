@@ -2,26 +2,28 @@
 
 import requests
 from bs4 import BeautifulSoup
-from tomorrow import threads
 
+import concurrent.futures
 import os
 import datetime
 
-@threads(10)
 def downloadPic(url, headers):
     print(f'Downloading: {url}')
 
     i = 0
+    
     while i < 3:
         try:
-            pic = requests.get(url, headers=headers, timeout=5)
+            pic = requests.get(url, headers=headers, timeout=5) 
         except:
             i += 1
-
+    if i < 3:
         folder = 'dist/assets/dmzj/' + url.split('https://images.dmzj.com/resource/news/')[1]
         os.makedirs(os.path.dirname(folder), exist_ok=True)
         with open(folder, 'wb') as f:
             f.write(pic.content)
+        
+        url = url.replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/My-Feeds@feeds/assets/dmzj/')
 
 
 def getContent(limit=5):
@@ -52,16 +54,16 @@ def getContent(limit=5):
             
             allPics = disc.find_all('img')
             if allPics:
-                for pics in allPics:
-                    headers = {
-                        'Host': 'images.dmzj.com', 
-                        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15', 
-                        'Referer': item['link']
-                    }
+                headers = {
+                    'Host': 'images.dmzj.com', 
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15', 
+                    'Referer': item['link']
+                }
                     
-                    url = pics['src']
-                    downloadPic(url, headers)
-                    pics['src'] = url.replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/My-Feeds@feeds/assets/dmzj/')
+                with concurrent.futures.ProcessPoolExecutor(max_workers=10) as executor:
+                    futures = [executor.submit(downloadPic, pics['src'], headers) for pics in allPics]
+                    for future in concurrent.futures.as_completed(futures):
+                        print(future.result())
 
             item['description'] = str(disc)
             
