@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 import datetime
 
-def getContent()
+def getContent():
     items = []
 
     for pageNum in range(7):

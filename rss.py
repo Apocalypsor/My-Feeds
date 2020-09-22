@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .Feeds import *
+from Feeds import *
 from feedgen.feed import FeedGenerator
 
 import sys
@@ -23,4 +23,4 @@ if __name__ == '__main__':
         feed.link(href='http://news.dmzj.com')
         addEntry(dmzj.getContent())
 
-        print(feed.rss_str(pretty=True))
+        feed.rss_file('dist/dmzj.xml')
