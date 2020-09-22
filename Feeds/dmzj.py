@@ -33,8 +33,12 @@ def getContent(limit=7):
             
             allPics = disc.find_all('img')
             if allPics:
-                for di in allPics:
-                    di['referrerpolicy'] = "no-referrer"
+                for pics in allPics:
+                    pic = requests.get(pics['src'], headers={'Host': 'images.dmzj.com', 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15', 'Referer': item['link']})
+                    folder = 'dist/assets/dmzj/' + pics['src'].split('https://images.dmzj.com/resource/news/')[1]
+                    os.makedirs(os.path.dirname(folder), exist_ok=True)
+                    with open(folder, 'wb') as f:
+                        f.write(pic.content)
 
             item['description'] = str(disc)
             
