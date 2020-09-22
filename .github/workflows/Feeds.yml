@@ -27,8 +27,8 @@ jobs:
         python rss.py dmzj
     - name: Push changes
       uses: JamesIves/github-pages-deploy-action@3.6.1
-        with:
-          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
-          BRANCH: feeds
-          FOLDER: dist
-          CLEAN: true
+      with:
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+        BRANCH: feeds
+        FOLDER: dist
+        CLEAN: true
