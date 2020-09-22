@@ -25,13 +25,10 @@ jobs:
       run: |
         mkdir dist
         python rss.py dmzj
-    - uses: autosuite/autocommit@master
-      with:
-        commit-message: Update Feeds
-        add-options: -A
     - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.REPO_TOKEN }}
-        branch: 'feeds'
-        directory: 'dist'
+      uses: JamesIves/github-pages-deploy-action@3.6.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+          BRANCH: feeds
+          FOLDER: dist
+          CLEAN: true
