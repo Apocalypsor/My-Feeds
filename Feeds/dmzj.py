@@ -43,11 +43,20 @@ def getContent(limit=5):
                     
                     url = pics['src']
                     print(f'Downloading: {url}')
-                    pic = requests.get(url, headers=headers)
+
+                    i = 0
+                    while i < 3:
+                        try:
+                            pic = requests.get(url, headers=headers, timeout=5)
+                        except:
+                            i += 1
+
                     folder = 'dist/assets/dmzj/' + pics['src'].split('https://images.dmzj.com/resource/news/')[1]
                     os.makedirs(os.path.dirname(folder), exist_ok=True)
                     with open(folder, 'wb') as f:
                         f.write(pic.content)
+                    
+                    pics['src'] = url.replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/My-Feeds@feeds/assets/dmzj/')
 
             item['description'] = str(disc)
             
