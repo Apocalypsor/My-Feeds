@@ -36,7 +36,7 @@ def getContent(limit=7):
                 for di in allPics:
                     di['referrerpolicy'] = "no-referrer"
 
-            item['description'] = disc
+            item['description'] = str(disc)
             
             items.append(item)
             
