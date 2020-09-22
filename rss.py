@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from Feeds import *
+from .Feeds import *
 from feedgen.feed import FeedGenerator
 
 import sys
