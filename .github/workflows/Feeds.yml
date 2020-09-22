@@ -21,7 +21,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Generate
+    - name: Generate DMZJ
       run: |
         mkdir dist
         python rss.py dmzj
