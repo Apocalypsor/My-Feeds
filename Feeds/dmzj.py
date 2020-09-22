@@ -2,9 +2,27 @@
 
 import requests
 from bs4 import BeautifulSoup
+from tomorrow import threads
 
 import os
 import datetime
+
+@threads(10)
+def downloadPic(url, headers):
+    print(f'Downloading: {url}')
+
+    i = 0
+    while i < 3:
+        try:
+            pic = requests.get(url, headers=headers, timeout=5)
+        except:
+            i += 1
+
+        folder = 'dist/assets/dmzj/' + url.split('https://images.dmzj.com/resource/news/')[1]
+        os.makedirs(os.path.dirname(folder), exist_ok=True)
+        with open(folder, 'wb') as f:
+            f.write(pic.content)
+
 
 def getContent(limit=5):
     items = []
@@ -42,20 +60,7 @@ def getContent(limit=5):
                     }
                     
                     url = pics['src']
-                    print(f'Downloading: {url}')
-
-                    i = 0
-                    while i < 3:
-                        try:
-                            pic = requests.get(url, headers=headers, timeout=5)
-                        except:
-                            i += 1
-
-                    folder = 'dist/assets/dmzj/' + pics['src'].split('https://images.dmzj.com/resource/news/')[1]
-                    os.makedirs(os.path.dirname(folder), exist_ok=True)
-                    with open(folder, 'wb') as f:
-                        f.write(pic.content)
-                    
+                    downloadPic(url, headers)
                     pics['src'] = url.replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/My-Feeds@feeds/assets/dmzj/')
 
             item['description'] = str(disc)
