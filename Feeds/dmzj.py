@@ -41,7 +41,7 @@ def getContent(limit=5):
                         'Referer': item['link']
                     }
                     
-                    url = pics['src']}
+                    url = pics['src']
                     print(f'Downloading: {url}')
                     pic = requests.get(url, headers=headers)
                     folder = 'dist/assets/dmzj/' + pics['src'].split('https://images.dmzj.com/resource/news/')[1]
