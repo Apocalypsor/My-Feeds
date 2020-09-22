@@ -29,11 +29,20 @@ def getContent():
         
             dmzjArticle = requests.get(item['link'])
             article = BeautifulSoup(dmzjArticle.text, 'html.parser')
-            item['description'] = article.find_all('div', 'news_content_con')[0].prettify()
-        
-            items.append(item)
+            disc= article.find_all('div', 'news_content_con')[0]
             
-        return items
+            allPics = disc.find_all('img')
+            if allPics:
+                for di in allPics:
+                    di['referrerpolicy'] = "no-referrer"
+
+            item['description'] = disc
+            
+            items.append(item)
+
+        break
+            
+    return items
         
 if __name__ == '__main__':
     feed = getContent()
