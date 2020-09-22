@@ -5,10 +5,10 @@ from bs4 import BeautifulSoup
 
 import datetime
 
-def getContent():
+def getContent(limit=7):
     items = []
 
-    for pageNum in range(7):
+    for pageNum in range(limit):
         dmzjPage = requests.get(f'http://news.dmzj.com/p{pageNum + 1}.html')
         content = BeautifulSoup(dmzjPage.text, 'html.parser')
         for news in content.find_all('div', 'briefnews_con_li'):
@@ -39,11 +39,9 @@ def getContent():
             item['description'] = disc
             
             items.append(item)
-
-        break
             
     return items
         
 if __name__ == '__main__':
-    feed = getContent()
+    feed = getContent(limit=1)
     print(feed)
