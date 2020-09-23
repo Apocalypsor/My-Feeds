@@ -48,7 +48,7 @@ def getContent(pageNum, download):
         
         dmzjArticle = requests.get(item['link'])
         article = BeautifulSoup(dmzjArticle.text, 'html.parser')
-        disc= article.find_all('div', 'news_content_con')[0]
+        disc= article.find('div', 'news_content_con')
             
         allPics = disc.find_all('img')
         if allPics and download:
@@ -61,6 +61,10 @@ def getContent(pageNum, download):
             for pic in allPics:
                 downloadPic(pic['src'], headers)
                 pic['src'] = pic['src'].replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/My-Feeds@feeds/assets/dmzj/')
+                
+        for c in disc.contents:
+            if c['style']:
+                del c['style']
 
         item['description'] = str(disc)
         
