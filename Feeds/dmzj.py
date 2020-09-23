@@ -70,22 +70,24 @@ def getContent(pageNum, download):
 
 def main(limit=4, download=True):
     from multiprocessing import Pool
-    pool = Pool(processes=4)
+    pool = Pool(processes=limit)
     
     results = []
     
-    print("Started processes")
-    for i in range(4):
+    for i in range(limit):
         print(f"Started process {i}")
-        result = pool.apply_async(getContent, (i, download)).get()
-        results += result
+        results.append(pool.apply_async(getContent, (i, download)))
     
     pool.close()
     pool.join()
     print("Subprocess done.")
     
-    return results
+    items = []
+    for r in results:
+        items += r.get()
+    
+    return items
     
 if __name__ == '__main__':
-    feed = main(limit=1, download=False)
+    feed = main(limit=2, download=False)
     print(feed)
