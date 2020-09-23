@@ -63,7 +63,7 @@ def getContent(pageNum, download):
                 pic['src'] = pic['src'].replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/My-Feeds@feeds/assets/dmzj/')
                 
         for c in disc.find_all(True):
-            if c['style']:
+            if c.has_attr('style'):
                 del c['style']
 
         item['description'] = str(disc)
