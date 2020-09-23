@@ -8,7 +8,7 @@ import sys
 feed = FeedGenerator()
 
 def addEntry(entries):
-    for entry in reversed(entries):
+    for entry in entries:
         feedEntry = feed.add_entry()
         feedEntry.title(entry['title'])
         feedEntry.link(href=entry['link'])

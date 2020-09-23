@@ -24,10 +24,22 @@ jobs:
       run: |
         mkdir dist
         python rss.py dmzj
-    - name: Push changes
+        [ -d "dist/assets" ] && mv dist/assets ./tmp
+    - name: Push RSS
       uses: JamesIves/github-pages-deploy-action@3.6.1
       with:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
         BRANCH: feeds
         FOLDER: dist
         CLEAN: true
+    - name: Push assets
+      env:
+        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+      run: |
+        git clone https://github.com/Apocalypsor/Storage /tmp/Storage
+        [ -d "/tmp/Storage/feed" ] && rm -rf /tmp/Storage/feed/* || mkdir /tmp/Storage/feed
+        mv tmp/* /tmp/Storage/feed && cd /tmp/Storage
+        git config --global user.name "GitHub Action"
+        git config --global user.email github-action@users.noreply.github.com
+        git cimmit -am 'Update feed assets'
+        git push https://Apocalypsor:$GITHUB_TOKEN@github.com/Apocalypsor/Storage

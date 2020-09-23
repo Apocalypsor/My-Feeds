@@ -60,7 +60,7 @@ def getContent(pageNum, download):
             
             for pic in allPics:
                 downloadPic(pic['src'], headers)
-                pic['src'] = pic['src'].replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/My-Feeds@feeds/assets/dmzj/')
+                pic['src'] = pic['src'].replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/Storage/feed/dmzj/')
                 
         for c in disc.find_all(True):
             if c.has_attr('style'):
@@ -91,7 +91,10 @@ def main(limit=4, download=True):
     for r in results:
         items += r.get()
     
-    return items
+    def takeTimestamp(elem):
+        return elem['timestamp']
+    
+    return items.sort(key=takeTimestamp)
     
 if __name__ == '__main__':
     feed = main(limit=2, download=False)
