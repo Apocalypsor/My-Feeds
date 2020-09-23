@@ -61,7 +61,8 @@ def getContent(pageNum, download):
             for pic in allPics:
                 downloadPic(pic['src'], headers)
                 pic['src'] = pic['src'].replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/Storage/feed/dmzj/')
-                
+                pic['referrerpolicy'] = 'no-referrer'
+
         for c in disc.find_all(True):
             if c.has_attr('style'):
                 del c['style']
