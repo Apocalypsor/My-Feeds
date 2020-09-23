@@ -70,7 +70,7 @@ def getContent(pageNum, download):
 
 def main(limit=4, download=True):
     from multiprocessing import Pool
-    pool = Pool(processes=limit)
+    pool = Pool(processes=4)
     
     results = []
     
