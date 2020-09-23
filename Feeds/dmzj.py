@@ -23,9 +23,6 @@ def downloadPic(url, headers):
         
         with open(folder, 'wb') as f:
             f.write(pic.content)
-        
-        url = url.replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/My-Feeds@feeds/assets/dmzj/')
-
 
 def getContent(pageNum, download):
     items = []
@@ -63,6 +60,7 @@ def getContent(pageNum, download):
             
             for pic in allPics:
                 downloadPic(pic['src'], headers)
+                pic['src'] = pic['src'].replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/My-Feeds@feeds/assets/dmzj/')
 
         item['description'] = str(disc)
         
