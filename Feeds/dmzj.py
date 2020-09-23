@@ -9,15 +9,18 @@ import datetime
 def downloadPic(url, headers):
     i = 0
     
+    print('Downloading:', url)
     while i < 3:
         try:
-            pic = requests.get(url, headers=headers, timeout=5) 
+            pic = requests.get(url, headers=headers, timeout=5)
+            break
         except:
             i += 1
 
     if i < 3:
         folder = 'dist/assets/dmzj/' + url.split('https://images.dmzj.com/resource/news/')[1]
         os.makedirs(os.path.dirname(folder), exist_ok=True)
+        
         with open(folder, 'wb') as f:
             f.write(pic.content)
         
