@@ -3,13 +3,10 @@
 import requests
 from bs4 import BeautifulSoup
 
-import concurrent.futures
 import os
 import datetime
 
 def downloadPic(url, headers):
-    print(f'Downloading: {url}')
-
     i = 0
     
     while i < 3:
@@ -27,51 +24,68 @@ def downloadPic(url, headers):
         url = url.replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/My-Feeds@feeds/assets/dmzj/')
 
 
-def getContent(limit=5):
+def getContent(pageNum, download):
     items = []
-
-    for pageNum in range(limit):
-        dmzjPage = requests.get(f'http://news.dmzj.com/p{pageNum + 1}.html')
-        content = BeautifulSoup(dmzjPage.text, 'html.parser')
-        for news in content.find_all('div', 'briefnews_con_li'):
     
-            detail = news.find('div', 'li_img_de')
-            dateStr = detail.find('p', 'head_con_p_o').get_text()
+    dmzjPage = requests.get(f'http://news.dmzj.com/p{pageNum + 1}.html')
+    content = BeautifulSoup(dmzjPage.text, 'html.parser')
+    for news in content.find_all('div', 'briefnews_con_li'):
+    
+        detail = news.find('div', 'li_img_de')
+        dateStr = detail.find('p', 'head_con_p_o').get_text()
         
-            date = datetime.date.fromisoformat(dateStr.split()[0])
-            time = datetime.time.fromisoformat(dateStr.split()[1])
+        date = datetime.datetime.fromisoformat(dateStr.split()[0] + ' ' + dateStr.split()[1])
 
-            pubDate = date.strftime('%a, %d %b %Y ') + time.strftime('%H:%M:%S +0800')
+        pubDate = date.strftime('%a, %d %b %Y %H:%M:%S +0800')
+        timestamp = date.timestamp()
         
-            item = {
-                'title': detail.h3.a["title"],
-                'link': detail.h3.a["href"],
-                'pubDate': pubDate
+        item = {
+            'title': detail.h3.a["title"],
+            'link': detail.h3.a["href"],
+            'pubDate': pubDate,
+            'timestamp': timestamp
+        }
+        
+        dmzjArticle = requests.get(item['link'])
+        article = BeautifulSoup(dmzjArticle.text, 'html.parser')
+        disc= article.find_all('div', 'news_content_con')[0]
+            
+        allPics = disc.find_all('img')
+        if allPics and download:
+            headers = {
+                'Host': 'images.dmzj.com', 
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15', 
+                'Referer': item['link']
             }
-        
-            dmzjArticle = requests.get(item['link'])
-            article = BeautifulSoup(dmzjArticle.text, 'html.parser')
-            disc= article.find_all('div', 'news_content_con')[0]
             
-            allPics = disc.find_all('img')
-            if allPics:
-                headers = {
-                    'Host': 'images.dmzj.com', 
-                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15', 
-                    'Referer': item['link']
-                }
-                    
-                with concurrent.futures.ProcessPoolExecutor(max_workers=10) as executor:
-                    futures = [executor.submit(downloadPic, pics['src'], headers) for pics in allPics]
-                    for future in concurrent.futures.as_completed(futures):
-                        print(future.result())
+            for pic in allPics:
+                downloadPic(pic['src'], headers)
 
-            item['description'] = str(disc)
-            
-            items.append(item)
+        item['description'] = str(disc)
+        
+        items.append(item)
+
             
     return items
-        
+
+def main(limit=4, download=True):
+    from multiprocessing import Pool
+    pool = Pool(processes=4)
+    
+    results = []
+    
+    print("Started processes")
+    for i in range(4):
+        print(f"Started process {i}")
+        result = pool.apply_async(getContent, (i, download)).get()
+        results += result
+    
+    pool.close()
+    pool.join()
+    print("Subprocess done.")
+    
+    return results
+    
 if __name__ == '__main__':
-    feed = getContent(limit=1)
+    feed = main(limit=1, download=False)
     print(feed)

@@ -21,6 +21,6 @@ if __name__ == '__main__':
         feed.title('动漫之家新闻')
         feed.description('动漫之家新闻RSS')
         feed.link(href='http://news.dmzj.com')
-        addEntry(dmzj.getContent())
+        addEntry(dmzj.main())
 
         feed.rss_file('dist/dmzj.xml')
