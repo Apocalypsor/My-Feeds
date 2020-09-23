@@ -93,8 +93,9 @@ def main(limit=4, download=True):
     
     def takeTimestamp(elem):
         return elem['timestamp']
+    items.sort(key=takeTimestamp)
     
-    return items.sort(key=takeTimestamp)
+    return items
     
 if __name__ == '__main__':
     feed = main(limit=2, download=False)
