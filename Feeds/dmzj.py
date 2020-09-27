@@ -1,28 +1,30 @@
 # -*- coding: utf-8 -*-
 
+import datetime
+import os
+
 import requests
 from bs4 import BeautifulSoup
 
-import os
-import datetime
 
 def downloadPic(url, headers):
     i = 0
-    
+
     print('Downloading:', url)
     while i < 3:
         try:
-            pic = requests.get(url, headers=headers, timeout=5)
+            res = requests.get(url, headers=headers, timeout=5)
+
+            folder = 'dist/assets/dmzj/' + url.split('https://images.dmzj.com/resource/news/')[1]
+            os.makedirs(os.path.dirname(folder), exist_ok=True)
+
+            with open(folder, 'wb') as f:
+                f.write(res.content)
+
             break
+
         except:
             i += 1
-
-    if i < 3:
-        folder = 'dist/assets/dmzj/' + url.split('https://images.dmzj.com/resource/news/')[1]
-        os.makedirs(os.path.dirname(folder), exist_ok=True)
-        
-        with open(folder, 'wb') as f:
-            f.write(pic.content)
 
 def getContent(pageNum, download):
     items = []
@@ -38,26 +40,29 @@ def getContent(pageNum, download):
 
         pubDate = date.strftime('%a, %d %b %Y %H:%M:%S +0800')
         timestamp = date.timestamp()
-        
+
         item = {
             'title': detail.h3.a["title"],
             'link': detail.h3.a["href"],
             'pubDate': pubDate,
             'timestamp': timestamp
         }
-        
+
+        if 'https://news.dmzj.com/' not in item['link']:
+            item['link'] = 'https://news.dmzj.com/article' + item['link'].split('/article')['1']
+
         dmzjArticle = requests.get(item['link'])
         article = BeautifulSoup(dmzjArticle.text, 'html.parser')
-        disc= article.find('div', 'news_content_con')
-            
+        disc = article.find('div', 'news_content_con')
+
         allPics = disc.find_all('img')
         if allPics and download:
             headers = {
-                'Host': 'images.dmzj.com', 
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15', 
+                'Host': 'images.dmzj.com',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
                 'Referer': item['link']
             }
-            
+
             for pic in allPics:
                 downloadPic(pic['src'], headers)
                 pic['src'] = pic['src'].replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/Storage/feed/dmzj/')
