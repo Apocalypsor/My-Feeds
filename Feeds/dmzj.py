@@ -11,7 +11,7 @@ def downloadPic(url, headers):
     i = 0
 
     print('Downloading:', url)
-    while i < 3:
+    while i < 5:
         try:
             res = requests.get(url, headers=headers, timeout=5)
 
