@@ -21,11 +21,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     - name: Generate DMZJ
+      id: dmzj
       run: |
         mkdir dist
-        python rss.py dmzj
-        [ -d "dist/assets" ] && mv dist/assets ./tmp
+        python rss.py dmzj && mv dist/assets ./tmp || echo "::set-output name=status::failed"
     - name: Push RSS
+      if: steps.dmzj.outputs.status != 'failed'
       uses: JamesIves/github-pages-deploy-action@3.6.1
       with:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
@@ -33,11 +34,12 @@ jobs:
         FOLDER: dist
         CLEAN: true
     - name: Push assets
+      if: steps.dmzj.outputs.status != 'failed'
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
       run: |
         git clone https://github.com/Apocalypsor/Storage /tmp/Storage
-        [ -d "/tmp/Storage/feed" ] && rm -rf /tmp/Storage/feed/* || mkdir /tmp/Storage/feed
+        [ -d "/tmp/Storage/feed" ] && rm -rf /tmp/Storage/feed/dmzj/ || mkdir /tmp/Storage/feed
         mv tmp/* /tmp/Storage/feed && cd /tmp/Storage
         git config --global user.name "GitHub Action"
         git config --global user.email github-action@users.noreply.github.com
