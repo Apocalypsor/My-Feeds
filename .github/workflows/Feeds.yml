@@ -35,13 +35,13 @@ jobs:
           FOLDER: dist
           CLEAN: true
       - name: Push assets
-        if: steps.dmzj.outputs.status != 'failed'
-      env:
-        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
-      run: |
-        git clone https://github.com/Apocalypsor/Storage /tmp/Storage
-        [ -d "/tmp/Storage/feed" ] && rm -rf /tmp/Storage/feed/dmzj/ || mkdir /tmp/Storage/feed
-        mv tmp/* /tmp/Storage/feed && cd /tmp/Storage
-        git config --global user.name "GitHub Action"
-        git config --global user.email github-action@users.noreply.github.com
-        git add . && git commit -am 'Update feed assets' && git push https://Apocalypsor:$GITHUB_TOKEN@github.com/Apocalypsor/Storage || echo 'Updated'
+        if: steps.dmzj.outputs.status != 'failed' || steps.acg178.outputs.status != 'failed'
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+        run: |
+          git clone https://github.com/Apocalypsor/Storage /tmp/Storage
+          [ -d "/tmp/Storage/feed" ] && rm -rf /tmp/Storage/feed/dmzj/ || mkdir /tmp/Storage/feed
+          mv tmp/* /tmp/Storage/feed && cd /tmp/Storage
+          git config --global user.name "GitHub Action"
+          git config --global user.email github-action@users.noreply.github.com
+          git add . && git commit -am 'Update feed assets' && git push https://Apocalypsor:$GITHUB_TOKEN@github.com/Apocalypsor/Storage || echo 'Updated'
