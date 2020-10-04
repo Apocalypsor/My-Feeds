@@ -2,13 +2,12 @@ name: Feeds
 
 on:
   workflow_dispatch:
-
-  on:
-    push:
-      branches:
-        - master
-      paths:
-        - '.github/workflows/**.yml'
+  
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/**.yml'
 
   schedule:
     - cron: 0 * * * *
