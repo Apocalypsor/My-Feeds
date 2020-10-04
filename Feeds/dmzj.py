@@ -53,9 +53,9 @@ def getContent(pageNum, download):
 
         dmzjArticle = requests.get(item['link'])
         article = BeautifulSoup(dmzjArticle.text, 'html.parser')
-        disc = article.find('div', 'news_content_con')
+        desc = article.find('div', 'news_content_con')
 
-        allPics = disc.find_all('img')
+        allPics = desc.find_all('img')
         if allPics and download:
             headers = {
                 'Host': 'images.dmzj.com',
@@ -68,11 +68,11 @@ def getContent(pageNum, download):
                 pic['src'] = pic['src'].replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/Storage/feed/dmzj/')
                 pic['referrerpolicy'] = 'no-referrer'
 
-        for c in disc.find_all(True):
+        for c in desc.find_all(True):
             if c.has_attr('style'):
                 del c['style']
 
-        item['description'] = str(disc)
+        item['description'] = str(desc)
         
         items.append(item)
 

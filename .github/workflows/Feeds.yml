@@ -11,30 +11,31 @@ jobs:
     name: Generate Feeds
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v1
-      with:
-        python-version: '3.8'
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Generate DMZJ
-      id: dmzj
-      run: |
-        mkdir dist
-        python rss.py dmzj && mv dist/assets ./tmp || echo "::set-output name=status::failed"
-    - name: Push RSS
-      if: steps.dmzj.outputs.status != 'failed'
-      uses: JamesIves/github-pages-deploy-action@3.6.1
-      with:
-        GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
-        BRANCH: feeds
-        FOLDER: dist
-        CLEAN: true
-    - name: Push assets
-      if: steps.dmzj.outputs.status != 'failed'
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.8'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Generate DMZJ
+        id: dmzj
+        run: python rss.py dmzj && mv dist/assets ./tmp || echo "::set-output name=status::failed"
+      - name: Generate ACG178
+        id: acg178
+        run: python rss.py acg178 || echo "::set-output name=status::failed"
+      - name: Push RSS
+        if: steps.dmzj.outputs.status != 'failed' || steps.acg178.outputs.status != 'failed'
+        uses: JamesIves/github-pages-deploy-action@3.6.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+          BRANCH: feeds
+          FOLDER: dist
+          CLEAN: true
+      - name: Push assets
+        if: steps.dmzj.outputs.status != 'failed'
       env:
         GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
       run: |
