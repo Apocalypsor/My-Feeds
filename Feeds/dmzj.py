@@ -48,7 +48,7 @@ def getContent(pageNum, download):
             'timestamp': timestamp
         }
 
-        if 'https://news.dmzj.com/' not in item['link']:
+        if 'http' not in item['link']:
             item['link'] = 'https://news.dmzj.com/article' + item['link'].split('/article')['1']
 
         dmzjArticle = requests.get(item['link'])
