@@ -15,7 +15,7 @@ def downloadPic(url, headers):
         try:
             res = requests.get(url, headers=headers, timeout=5)
 
-            folder = 'dist/assets/dmzj/' + url.split('https://images.dmzj.com/resource/news/')[1]
+            folder = 'dist/assets/dmzj/' + url.split('/news/')[1]
             os.makedirs(os.path.dirname(folder), exist_ok=True)
 
             with open(folder, 'wb') as f:
