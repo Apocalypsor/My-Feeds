@@ -49,7 +49,7 @@ def getContent(pageNum, download):
         }
 
         if 'http' not in item['link']:
-            item['link'] = 'https://news.dmzj.com/article' + item['link'].split('/article')['1']
+            item['link'] = 'https://news.dmzj.com/article' + item['link'].split('/article')[1]
 
         dmzjArticle = requests.get(item['link'])
         article = BeautifulSoup(dmzjArticle.text, 'html.parser')
@@ -65,8 +65,7 @@ def getContent(pageNum, download):
 
             for pic in allPics:
                 downloadPic(pic['src'], headers)
-                pic['src'] = pic['src'].replace('https://images.dmzj.com/resource/news/', 'https://cdn.jsdelivr.net/gh/Apocalypsor/Storage/feed/dmzj/')
-                pic['referrerpolicy'] = 'no-referrer'
+                pic['src'] = 'https://cdn.jsdelivr.net/gh/Apocalypsor/Storage/feed/dmzj/' + pic['src'].split('/resource/news/')[1]
 
         for c in desc.find_all(True):
             if c.has_attr('style'):
