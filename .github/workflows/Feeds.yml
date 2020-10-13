@@ -28,18 +28,20 @@ jobs:
           pip install -r requirements.txt
       - name: Generate DMZJ
         id: dmzj
-        run: python rss.py dmzj && mv dist/assets ./tmp || echo "::set-output name=status::failed"
+        run: python rss.py dmzj || echo "::set-output name=status::failed"
       - name: Generate ACG178
         id: acg178
         run: python rss.py acg178 || echo "::set-output name=status::failed"
       - name: Push RSS
         if: steps.dmzj.outputs.status != 'failed' || steps.acg178.outputs.status != 'failed'
-        uses: JamesIves/github-pages-deploy-action@3.6.1
-        with:
+        env:
           GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
-          BRANCH: feeds
-          FOLDER: dist
-          CLEAN: true
+        run: |
+          git clone -b feeds https://github.com/$GITHUB_REPOSITORY /tmp/Feeds
+          mv -f dist/* /tmp/Feeds/
+          git config --global user.name "GitHub Action"
+          git config --global user.email github-action@users.noreply.github.com
+          cd /tmp/Feeds && git add . && git commit -am 'Update feeds' && git push https://Apocalypsor:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY || echo 'Updated'
       - name: Push assets
         if: steps.dmzj.outputs.status != 'failed' || steps.acg178.outputs.status != 'failed'
         env:
