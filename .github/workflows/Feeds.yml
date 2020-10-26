@@ -26,6 +26,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          git clone -b feeds https://github.com/$GITHUB_REPOSITORY dist
       - name: Generate DMZJ
         id: dmzj
         run: python rss.py dmzj || echo "::set-output name=status::failed"
@@ -37,11 +38,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
         run: |
-          git clone -b feeds https://github.com/$GITHUB_REPOSITORY /tmp/Feeds
-          mv -f dist/* /tmp/Feeds/
           git config --global user.name "GitHub Action"
           git config --global user.email github-action@users.noreply.github.com
-          cd /tmp/Feeds && git add . && git commit -am 'Update feeds' && git push https://Apocalypsor:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY || echo 'Updated'
+          cd dist && git add . && git commit -am 'Update feeds' && git push https://Apocalypsor:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY || echo 'Updated'
       - name: Push assets
         if: steps.dmzj.outputs.status != 'failed' || steps.acg178.outputs.status != 'failed'
         env:
