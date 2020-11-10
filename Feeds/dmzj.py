@@ -30,7 +30,7 @@ def downloadPic(url, headers):
 def getContent(pageNum, download):
     items = []
 
-    dmzjPage = requests.get(f"https://news.dmzj.com/p{pageNum + 1}.html")
+    dmzjPage = requests.get(f"https://news.dmzj.com/p{pageNum + 1}.html", timeout=5)
     content = BeautifulSoup(dmzjPage.text, "html.parser")
     for news in content.find_all("div", "briefnews_con_li"):
 
@@ -56,7 +56,7 @@ def getContent(pageNum, download):
                     "https://news.dmzj.com/article" + item["link"].split("/article")[1]
             )
 
-        dmzjArticle = requests.get(item["link"])
+        dmzjArticle = requests.get(item["link"], timeout=5)
         article = BeautifulSoup(dmzjArticle.text, "html.parser")
         desc = article.find("div", "news_content_con")
 

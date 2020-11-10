@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 
 def getContent():
     items = []
-    acg = requests.get("https://acg.178.com/")
+    acg = requests.get("https://acg.178.com/", timeout=5)
     contents = BeautifulSoup(acg.text, "html.parser")
 
     for news in contents.find_all("p", "textbox"):
@@ -31,7 +31,7 @@ def getContent():
             "timestamp": timestamp,
         }
 
-        acgArticle = requests.get(link)
+        acgArticle = requests.get(link, timeout=5)
         article = BeautifulSoup(acgArticle.text, "html.parser")
 
         desc = article.find("div", "bd")
