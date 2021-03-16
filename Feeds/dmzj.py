@@ -7,27 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def downloadPic(url, headers):
-    i = 0
-
-    print("Downloading:", url)
-    while i < 5:
-        try:
-            res = requests.get(url, headers=headers, timeout=5)
-
-            folder = "tmp/dmzj/" + url.split("/news/")[1]
-            os.makedirs(os.path.dirname(folder), exist_ok=True)
-
-            with open(folder, "wb") as f:
-                f.write(res.content)
-
-            break
-
-        except:
-            i += 1
-
-
-def getContent(pageNum, download):
+def getContent(pageNum):
     items = []
 
     dmzjPage = requests.get(f"https://news.dmzj.com/p{pageNum + 1}.html", timeout=5)
@@ -53,31 +33,25 @@ def getContent(pageNum, download):
 
         if "http" not in item["link"]:
             item["link"] = (
-                    "https://news.dmzj.com/article" + item["link"].split("/article")[1]
+                "https://news.dmzj.com/article" + item["link"].split("/article")[1]
             )
 
         dmzjArticle = requests.get(item["link"], timeout=5)
         article = BeautifulSoup(dmzjArticle.text, "html.parser")
         desc = article.find("div", "news_content_con")
 
-        allPics = desc.find_all("img")
-        if allPics and download:
-            headers = {
-                "Host": "images.dmzj.com",
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15",
-                "Referer": item["link"],
-            }
-
+        try:
+            allPics = desc.find_all("img")
             for pic in allPics:
-                downloadPic(pic["src"], headers)
-                pic["src"] = (
-                        "https://cdn.jsdelivr.net/gh/Apocalypsor/Storage/feed/dmzj/"
-                        + pic["src"].split("/resource/news/")[1]
+                pic["src"] = pic["src"].replace(
+                    "images.dmzj.com", "dmzj.apocalypse.workers.dev"
                 )
 
-        for c in desc.find_all(True):
-            if c.has_attr("style"):
-                del c["style"]
+            for c in desc.find_all(True):
+                if c.has_attr("style"):
+                    del c["style"]
+        except AttributeError as e:
+            print("No images!")
 
         item["description"] = str(desc)
 
@@ -86,7 +60,7 @@ def getContent(pageNum, download):
     return items
 
 
-def main(limit=4, download=True):
+def main(limit=4):
     from multiprocessing import Pool
 
     pool = Pool(processes=4)
@@ -95,7 +69,7 @@ def main(limit=4, download=True):
 
     for i in range(limit):
         print(f"Started process {i}")
-        results.append(pool.apply_async(getContent, (i, download)))
+        results.append(pool.apply_async(getContent, (i,)))
 
     pool.close()
     pool.join()
@@ -114,5 +88,5 @@ def main(limit=4, download=True):
 
 
 if __name__ == "__main__":
-    feed = main(limit=2, download=False)
+    feed = main(limit=2)
     print(feed)
