@@ -18,6 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.REPO_TOKEN }}
+          fetch-depth: '0'
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
@@ -39,9 +42,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
         run: |
           python -m markdown2 README.md > dist/index.html
+          mv dist /tmp
           git config --global user.name "GitHub Action"
           git config --global user.email github-action@users.noreply.github.com
-          cd dist && git init && git add . && git commit -am 'Update feeds'
-          git remote add origin https://${{ github.repository_owner }}:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY
-          git push --set-upstream origin feeds
-          git push -f || echo 'Updated'
+          git checkout --orphan tmp
+          rm -rf * && mv /tmp/dist/* . && git add . && git commit -am 'Update feeds'
+          git branch -u origin/feeds
+          git push -f origin HEAD:feeds || echo 'Updated'
