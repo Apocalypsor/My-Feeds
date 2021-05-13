@@ -11,7 +11,7 @@ def downloadPic(url, headers):
     i = 0
 
     print("Downloading:", url)
-    while i < 5:
+    while i < 10:
         try:
             res = requests.get(url, headers=headers, timeout=5)
 
@@ -56,7 +56,12 @@ def getContent(pageNum, download):
                     "https://news.dmzj.com/article" + item["link"].split("/article")[1]
             )
 
-        dmzjArticle = requests.get(item["link"], timeout=5)
+        while i < 5:
+            try:
+                dmzjArticle = requests.get(item["link"], timeout=5)
+            except:
+                i += 1
+
         article = BeautifulSoup(dmzjArticle.text, "html.parser")
         desc = article.find("div", "news_content_con")
 
