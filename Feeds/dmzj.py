@@ -79,7 +79,7 @@ def getContent(pageNum, download):
                 for pic in allPics:
                     downloadPic(pic["src"], headers)
                     pic["src"] = (
-                            "https://dmzj.pages.dev/images/dmzj/"
+                            "https://feedx.pages.dev/images/dmzj/"
                             + pic["src"].split("/resource/news/")[1]
                     )
     
