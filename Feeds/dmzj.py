@@ -67,28 +67,29 @@ def getContent(pageNum, download):
         article = BeautifulSoup(dmzjArticle.text, "html.parser")
         desc = article.find("div", "news_content_con")
 
-        allPics = desc.find_all("img")
-        if allPics and download:
-            headers = {
-                "Host": "images.dmzj.com",
-                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15",
-                "Referer": item["link"],
-            }
-
-            for pic in allPics:
-                downloadPic(pic["src"], headers)
-                pic["src"] = (
-                        "https://dmzj.pages.dev/images/dmzj/"
-                        + pic["src"].split("/resource/news/")[1]
-                )
-
-        for c in desc.find_all(True):
-            if c.has_attr("style"):
-                del c["style"]
-
-        item["description"] = str(desc)
-
-        items.append(item)
+        if desc:
+            allPics = desc.find_all("img")
+            if allPics and download:
+                headers = {
+                    "Host": "images.dmzj.com",
+                    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15",
+                    "Referer": item["link"],
+                }
+    
+                for pic in allPics:
+                    downloadPic(pic["src"], headers)
+                    pic["src"] = (
+                            "https://dmzj.pages.dev/images/dmzj/"
+                            + pic["src"].split("/resource/news/")[1]
+                    )
+    
+            for c in desc.find_all(True):
+                if c.has_attr("style"):
+                    del c["style"]
+    
+            item["description"] = str(desc)
+    
+            items.append(item)
 
     return items
 
