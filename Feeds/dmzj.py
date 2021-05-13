@@ -13,7 +13,7 @@ def downloadPic(url, headers):
     print("Downloading:", url)
     while i < 10:
         try:
-            res = requests.get(url, headers=headers, timeout=5)
+            res = requests.get(url, headers=headers, timeout=10)
 
             folder = "dist/images/dmzj/" + url.split("/news/")[1]
             os.makedirs(os.path.dirname(folder), exist_ok=True)
@@ -30,7 +30,7 @@ def downloadPic(url, headers):
 def getContent(pageNum, download):
     items = []
 
-    dmzjPage = requests.get(f"https://news.dmzj.com/p{pageNum + 1}.html", timeout=5)
+    dmzjPage = requests.get(f"https://news.dmzj.com/p{pageNum + 1}.html", timeout=20)
     content = BeautifulSoup(dmzjPage.text, "html.parser")
     for news in content.find_all("div", "briefnews_con_li"):
 
@@ -56,11 +56,12 @@ def getContent(pageNum, download):
                     "https://news.dmzj.com/article" + item["link"].split("/article")[1]
             )
 
-        while i < 5:
+        t = 0
+        while t < 5:
             try:
-                dmzjArticle = requests.get(item["link"], timeout=5)
+                dmzjArticle = requests.get(item["link"], timeout=10)
             except:
-                i += 1
+                t += 1
 
         article = BeautifulSoup(dmzjArticle.text, "html.parser")
         desc = article.find("div", "news_content_con")
