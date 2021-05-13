@@ -60,6 +60,7 @@ def getContent(pageNum, download):
         while t < 5:
             try:
                 dmzjArticle = requests.get(item["link"], timeout=10)
+                break
             except:
                 t += 1
 
