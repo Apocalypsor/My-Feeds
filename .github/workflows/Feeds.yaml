@@ -10,7 +10,7 @@ on:
       - '.github/workflows/Feeds.yaml'
 
   schedule:
-    - cron: 0 * * * *
+    - cron: 0 4 * * *
 
 jobs:
   feeds:
