@@ -15,7 +15,7 @@ def downloadPic(url, headers):
         try:
             res = requests.get(url, headers=headers, timeout=5)
 
-            folder = "tmp/dmzj/" + url.split("/news/")[1]
+            folder = "dist/images/dmzj/" + url.split("/news/")[1]
             os.makedirs(os.path.dirname(folder), exist_ok=True)
 
             with open(folder, "wb") as f:
@@ -71,7 +71,7 @@ def getContent(pageNum, download):
             for pic in allPics:
                 downloadPic(pic["src"], headers)
                 pic["src"] = (
-                        "https://cdn.jsdelivr.net/gh/Apocalypsor/Storage/feed/dmzj/"
+                        "https://dmzj.pages.dev/images/dmzj/"
                         + pic["src"].split("/resource/news/")[1]
                 )
 
@@ -86,10 +86,10 @@ def getContent(pageNum, download):
     return items
 
 
-def main(limit=4, download=True):
+def main(limit=8, download=True):
     from multiprocessing import Pool
 
-    pool = Pool(processes=4)
+    pool = Pool(processes=limit)
 
     results = []
 

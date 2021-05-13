@@ -25,30 +25,22 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          git clone -b feeds https://github.com/$GITHUB_REPOSITORY dist
+          python -m pip install pipenv markdown2
+          pipenv install
       - name: Generate DMZJ
         id: dmzj
-        run: python rss.py dmzj || echo "::set-output name=status::failed"
+        run: pipenv run python rss.py dmzj || echo "::set-output name=status::failed"
       - name: Generate ACG178
         id: acg178
-        run: python rss.py acg178 || echo "::set-output name=status::failed"
+        run: pipenv run python rss.py acg178 || echo "::set-output name=status::failed"
       - name: Push RSS
         if: steps.dmzj.outputs.status != 'failed' || steps.acg178.outputs.status != 'failed'
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
         run: |
+          python -m markdown2 README.md > dist/index.html
           git config --global user.name "GitHub Action"
           git config --global user.email github-action@users.noreply.github.com
-          cd dist && git add . && git commit -am 'Update feeds' && git push https://Apocalypsor:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY || echo 'Updated'
-      - name: Push assets
-        if: steps.dmzj.outputs.status != 'failed' || steps.acg178.outputs.status != 'failed'
-        env:
-          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
-        run: |
-          git clone https://github.com/Apocalypsor/Storage /tmp/Storage
-          [ -d "/tmp/Storage/feed" ] && rm -rf /tmp/Storage/feed/dmzj/ || mkdir /tmp/Storage/feed
-          mv tmp/* /tmp/Storage/feed && cd /tmp/Storage
-          git config --global user.name "GitHub Action"
-          git config --global user.email github-action@users.noreply.github.com
-          git add . && git commit -am 'Update feed assets' && git push https://Apocalypsor:$GITHUB_TOKEN@github.com/Apocalypsor/Storage || echo 'Updated'
+          cd dist && git init && git add . && git commit -am 'Update feeds'
+          git remote add origin https://${{ github.repository_owner }}:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY
+          git push -f origin/feeds master || echo 'Updated'
