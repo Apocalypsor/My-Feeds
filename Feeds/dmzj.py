@@ -3,7 +3,7 @@
 import datetime
 import os
 
-import requests
+from .utils import getUrl
 from bs4 import BeautifulSoup
 
 
@@ -11,26 +11,20 @@ def downloadPic(url, headers):
     i = 0
 
     print("Downloading:", url)
-    while i < 10:
-        try:
-            res = requests.get(url, headers=headers, timeout=10)
+    res = getUrl(url, headers=headers, retry=10, timeout=20)
 
-            folder = "dist/images/dmzj/" + url.split("/news/")[1]
-            os.makedirs(os.path.dirname(folder), exist_ok=True)
+    folder = "dist/images/dmzj/" + url.split("/news/")[1]
+    os.makedirs(os.path.dirname(folder), exist_ok=True)
 
-            with open(folder, "wb") as f:
-                f.write(res.content)
+    with open(folder, "wb") as f:
+        f.write(res.content)
 
-            break
-
-        except:
-            i += 1
 
 
 def getContent(pageNum, download):
     items = []
 
-    dmzjPage = requests.get(f"https://news.dmzj.com/p{pageNum + 1}.html", timeout=20)
+    dmzjPage = getUrl(f"https://news.dmzj.com/p{pageNum + 1}.html")
     content = BeautifulSoup(dmzjPage.text, "html.parser")
     for news in content.find_all("div", "briefnews_con_li"):
 
@@ -56,13 +50,7 @@ def getContent(pageNum, download):
                     "https://news.dmzj.com/article" + item["link"].split("/article")[1]
             )
 
-        t = 0
-        while t < 5:
-            try:
-                dmzjArticle = requests.get(item["link"], timeout=10)
-                break
-            except:
-                t += 1
+        dmzjArticle = getUrl(item["link"])
 
         article = BeautifulSoup(dmzjArticle.text, "html.parser")
         desc = article.find("div", "news_content_con")
@@ -119,8 +107,3 @@ def main(limit=8, download=True):
     items.sort(key=takeTimestamp)
 
     return items
-
-
-if __name__ == "__main__":
-    feed = main(limit=2, download=False)
-    print(feed)

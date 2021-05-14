@@ -2,13 +2,13 @@
 
 import datetime
 
-import requests
+from .utils import getUrl
 from bs4 import BeautifulSoup
 
 
 def getContent():
     items = []
-    acg = requests.get("https://acg.178.com/", timeout=5)
+    acg = getUrl("https://acg.178.com/")
     contents = BeautifulSoup(acg.text, "html.parser")
 
     for news in contents.find_all("p", "textbox"):
@@ -31,7 +31,7 @@ def getContent():
             "timestamp": timestamp,
         }
 
-        acgArticle = requests.get(link, timeout=5)
+        acgArticle = getUrl(link)
         article = BeautifulSoup(acgArticle.text, "html.parser")
 
         desc = article.find("div", "bd")
@@ -59,8 +59,3 @@ def main():
     items.sort(key=takeTimestamp)
 
     return items
-
-
-if __name__ == "__main__":
-    feed = main()
-    print(feed)
