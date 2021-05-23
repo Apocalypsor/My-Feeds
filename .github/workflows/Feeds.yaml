@@ -33,11 +33,8 @@ jobs:
       - name: Generate DMZJ
         id: dmzj
         run: pipenv run python rss.py dmzj && cat dist/dmzj.xml > /dev/null || echo "::set-output name=status::failed"
-      - name: Generate ACG178
-        id: acg178
-        run: pipenv run python rss.py acg178 && cat dist/acg178.xml > /dev/null || echo "::set-output name=status::failed"
       - name: Push RSS
-        if: steps.dmzj.outputs.status != 'failed' || steps.acg178.outputs.status != 'failed'
+        if: steps.dmzj.outputs.status != 'failed'
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
         run: |
