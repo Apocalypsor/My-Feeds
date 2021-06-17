@@ -49,8 +49,8 @@ jobs:
         run: |
           python -m markdown2 README.md > dist/index.html
           mv dist /tmp
-          git config --global user.name "GitHub Action"
-          git config --global user.email github-action@users.noreply.github.com
+          git config --global user.name "Action Bot"
+          git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
           git checkout --orphan tmp
           rm -rf * && mv /tmp/dist/* . && git add . && git commit -am 'Update feeds'
           git branch -u origin/feeds
