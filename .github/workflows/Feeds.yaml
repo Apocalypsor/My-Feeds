@@ -1,0 +1,57 @@
+name: Feeds
+
+on:
+  workflow_dispatch:
+  
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/Feeds.yaml'
+
+  schedule:
+    - cron: 0 */2 * * *
+
+jobs:
+  feeds:
+    name: Generate Feeds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.REPO_TOKEN }}
+          fetch-depth: '0'
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.8'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pipenv markdown2
+      - name: Cache pipenv
+        uses: actions/cache@v2
+        id: cache-pipenv
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('Pipfile.lock') }}
+          restore-keys: ${{ runner.os }}-pipenv-
+      - name: Install dependencies
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
+        run: pipenv install
+      - name: Generate DMZJ
+        id: dmzj
+        run: pipenv run python rss.py dmzj && cat dist/dmzj.xml > /dev/null || echo "::set-output name=status::failed"
+      - name: Push RSS
+        if: steps.dmzj.outputs.status != 'failed'
+        env:
+          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
+        run: |
+          python -m markdown2 README.md > dist/index.html
+          mv dist /tmp
+          git config --global user.name "Action Bot"
+          git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git checkout --orphan tmp
+          rm -rf * && mv /tmp/dist/* . && git add . && git commit -am 'Update feeds'
+          git branch -u origin/feeds
+          git push -f origin HEAD:feeds || echo 'Updated'
