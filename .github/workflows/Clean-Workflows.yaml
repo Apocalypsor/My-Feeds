@@ -33,8 +33,7 @@ jobs:
         run: pipenv install
       - name: Clean
         env:
-          GITHUB_USER: ${{ github.repository_owner }}
           GITHUB_REPO: ${{ github.repository }}
-          GITHUB_TOKEN: ${{ secrets.REPO_TOKEN }}
-          EXPIRE_TIME: '1d'
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+          EXPIRE_TIME: '1h'
         run: pipenv run python run.py
