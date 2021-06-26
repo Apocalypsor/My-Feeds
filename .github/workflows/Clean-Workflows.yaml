@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Delete workflow runs
-        uses: https://github.com/Apocalypsor/Workflows-Cleaner@main
+        uses: Apocalypsor/Workflows-Cleaner@main
         with:
           github_token: ${{ secrets.REPO_TOKEN }}
           expire_time: 1d
