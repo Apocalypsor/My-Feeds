@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Delete workflow runs
-        uses: GitRML/delete-workflow-runs@main
+        uses: https://github.com/Apocalypsor/Workflows-Cleaner@main
         with:
-          token: ${{ secrets.REPO_TOKEN }}
-          retain_days: 1
+          github_token: ${{ secrets.REPO_TOKEN }}
+          expire_time: 1d
